@@ -18,8 +18,8 @@ exports.getProduct = (req, res, next) => {
   Product.findByPk(prodId)
     .then((product) => {
       res.render('shop/product-detail', {
-        pageTitle: product[0].title,
-        product: product[0],
+        pageTitle: product.title,
+        product: product,
         path: '/products',
       });
     })
