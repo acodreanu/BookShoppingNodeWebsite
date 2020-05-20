@@ -13,8 +13,6 @@ class User {
     const db = getDb();
 
     return db.collection('users').insertOne(this);
-    // .then((result) => console.log(result))
-    // .catch((err) => console.log(err));
   }
 
   getCart() {
@@ -82,6 +80,44 @@ class User {
         { _id: new mongoDb.ObjectID(this.id) },
         { $set: { cart: updatedCart } }
       );
+  }
+
+  addOrder() {
+    const db = getDb();
+    return this.getCart()
+      .then((products) => {
+        const order = {
+          items: products,
+          user: {
+            _id: new mongoDb.ObjectID(this.id),
+            name: this.name,
+          },
+        };
+        return db.collection('orders').insertOne(order);
+      })
+      .then((result) => {
+        this.cart = { items: [] };
+
+        return db
+          .collection('users')
+          .updateOne(
+            { _id: new mongoDb.ObjectID(this.id) },
+            { $set: { cart: { items: [] } } }
+          );
+      });
+  }
+
+  getOrders() {
+    const db = getDb();
+    console.log(new mongoDb.ObjectID(this.id))
+
+    return (
+      db
+        .collection('orders')
+        // .find()
+        .find({ 'user._id': new mongoDb.ObjectID(this.id) })
+        .toArray()
+    );
   }
 
   static findById(userId) {
