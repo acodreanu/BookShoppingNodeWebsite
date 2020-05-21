@@ -1,5 +1,4 @@
 const Product = require('../models/product');
-const mongoDb = require('mongodb');
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -14,14 +13,13 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(
-    title,
-    price,
-    description,
-    imageUrl,
-    null,
-    req.user._id
-  );
+  const product = new Product({
+    title: title,
+    price: price,
+    imageUrl: imageUrl,
+    description: description,
+    userId: req.user,
+  });
   product
     .save()
     .then((result) => {
@@ -58,15 +56,14 @@ exports.postEditProduct = (req, res, next) => {
   const upPrice = req.body.price;
   const upImageUrl = req.body.imageUrl;
   const upDescription = req.body.description;
-  const product = new Product(
-    upTitle,
-    upPrice,
-    upDescription,
-    upImageUrl,
-    prodId
-  );
-  product
-    .save()
+  Product.findById(prodId)
+    .then((product) => {
+      product.title = upTitle;
+      product.price = upPrice;
+      product.description = upDescription;
+      product.imageUrl = upImageUrl;
+      product.save();
+    })
     .then((result) => {
       console.log('UPDATED PRODUCT');
       res.redirect('/admin/products');
@@ -76,7 +73,7 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.deleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteById(prodId)
+  Product.findByIdAndRemove(prodId)
     .then(() => {
       console.log('DESTROYED PRODUCT');
       res.redirect('/admin/products');
@@ -85,8 +82,11 @@ exports.deleteProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
+    // .select('title price -_id')
+    // .populate('userId', 'name')
     .then((products) => {
+      console.log(products);
       res.render('admin/products', {
         prods: products,
         pageTitle: 'Admin Products',
