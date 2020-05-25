@@ -4,6 +4,5 @@ exports.get404Page = (req, res, next) => {
     .render('404', {
       pageTitle: 'Page Not Found',
       path: req.path,
-      isAuthenticated: req.session.isLoggedIn,
     });
 };
