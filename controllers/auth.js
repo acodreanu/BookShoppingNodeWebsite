@@ -55,20 +55,19 @@ exports.postLogin = (req, res, next) => {
 
   User.findOne({ email: email })
     .then((user) => {
-      User.findOne({ email: email }).then((userDoc) => {
-        if (!userDoc) {
-          return res.status(422).render('auth/login', {
-            path: '/login',
-            pageTitle: 'Login',
-            errorMessage: 'Invalid email or password.',
-            oldInput: {
-              email: email,
-              password: password,
-            },
-            validationErrors: [],
-          });
-        }
-      });
+      if (!user) {
+        return res.status(422).render('auth/login', {
+          path: '/login',
+          pageTitle: 'Login',
+          errorMessage: 'Invalid email or password.',
+          oldInput: {
+            email: email,
+            password: password,
+          },
+          validationErrors: [],
+        });
+      }
+
       bcrypt
         .compare(password, user.password)
         .then((match) => {
@@ -98,6 +97,7 @@ exports.postLogin = (req, res, next) => {
         });
     })
     .catch((err) => {
+      console.log(err);
       const error = new Error(err);
       error.httpStatusCode = 500;
       return next(error);

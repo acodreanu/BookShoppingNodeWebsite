@@ -14,7 +14,6 @@ const productValidations = [
     .withMessage('Title should contain only text and numbers.')
     .isLength({ min: 2 })
     .withMessage('Title should have at least two characters.'),
-  body('imageUrl').isURL().withMessage('ImageUrl should be and URL.'),
   body('price').isNumeric().withMessage('Price should be a number.'),
 ];
 
