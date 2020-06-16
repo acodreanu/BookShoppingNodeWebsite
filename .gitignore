@@ -1,6 +1,4 @@
 node_modules
-data
-images
 nodemon.json
 server.cert
 server.key
