@@ -1,13 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 
-const stripe = require('stripe')('<STRIPE_KEY>');
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 const PDFDocument = require('pdfkit');
 
 const Product = require('../models/product');
 const Order = require('../models/order');
 
-const ITEMS_PER_PAGE = 1;
+const ITEMS_PER_PAGE = 3;
 
 exports.getProducts = (req, res, next) => {
   const page = +req.query.page || 1;
@@ -96,6 +96,7 @@ exports.getCart = (req, res, next) => {
     .execPopulate()
     .then((user) => {
       const products = user.cart.items;
+      console.log(products)
       res.render('shop/cart', {
         pageTitle: 'Your Cart',
         path: '/cart',
